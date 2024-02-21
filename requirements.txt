@@ -1,0 +1,10 @@
+#python -m pip install -r requirements.txt
+
+whisper==1.1.10
+sounddevice==0.4.6
+numpy==1.26.4
+certifi==2024.2.2
+charset-normalizer==3.3.2
+idna==3.6
+requests==2.31.0
+urllib3==2.2.0s
