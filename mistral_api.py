@@ -2,10 +2,10 @@ import requests
 import json
 import os
 
-def send_post(api_url, transcription):
-
-    # Read the file in binary mode, then decode with 'utf-8' and replace errors
-    user_transcription = transcription
+def send_post_mistral(api_url, transcription, prompt):
+    user_transcription = prompt + transcription
+    print(f"[debug] user_transcription: {user_transcription}")
+        
 
     data = {
         "Content-Type": "application/json",
@@ -32,7 +32,9 @@ def send_post(api_url, transcription):
         # with open(file_directory, 'w') as file:
         #     pass
 
-        print("User audio input prompt:", transcription)
+        print("User audio input prompt:", user_transcription)
         print("LLM response:", content)
     else:
         print("Error:", response.status_code, response.text)
+
+    return content

@@ -8,3 +8,15 @@ charset-normalizer==3.3.2
 idna==3.6
 requests==2.31.0
 urllib3==2.2.0s
+
+#Dino
+torch
+torchvision
+transformers
+addict
+yapf
+timm
+numpy
+opencv-python
+supervision==0.4.0
+pycocotools
