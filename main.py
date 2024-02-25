@@ -18,7 +18,7 @@ def main():
 
     if not os.path.exists('feed_images'):
         os.makedirs('feed_images')
-
+ 
     model = whisper.load_model("base")
 
     audio_queue = queue.Queue()
@@ -36,12 +36,12 @@ def main():
     transcription_thread.start()
     recording_thread.start()
     camera_thread.start()
-
-    print("Recording and camera feed active... Press spacebar to capture image and stop.")
+  
     keyboard.wait('space')
     capture_event.set() 
     stop_recording_event.set()
     audio_queue.put(None)
+    print("Recording and camera feed active... Press spacebar to capture image and stop.")
 
     # Wait for threads to finish
     recording_thread.join()
@@ -84,7 +84,7 @@ def main():
         prompt = ""
         send_post_mistral(URL, full_transcription, prompt)
 
-    elif contains_word(full_transcription, "where"):
+    elif contains_word(full_transcription, "where"):  
         print("following where path")
         object_detect(image_path, full_transcription)    
     
