@@ -31,11 +31,11 @@ def main():
     recording_thread = threading.Thread(target=record_audio, args=(audio_queue, stop_recording_event, audio_directory))
     camera_thread = threading.Thread(target=camera_feed, args=(capture_event, 'feed_images', 'capture.png'))  # Add capture event and image info
 
-    print("Press spacebar to start recording and live cam.")
     keyboard.wait('space')  
     transcription_thread.start()
     recording_thread.start()
     camera_thread.start()
+    print("Press spacebar to start recording and live cam.")
   
     keyboard.wait('space')
     capture_event.set() 
