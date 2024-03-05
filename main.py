@@ -3,14 +3,31 @@ import queue
 import threading
 import keyboard
 import whisper
+import supervision as sv
+import cv2
+import os
+import io
+import base64
+import re
+import numpy as np
+from PIL import Image as im 
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+
+from io import BytesIO
+from PIL import Image
 from record import record_audio
 from transcribe import transcribe_audio
-from word_search import contains_word
+from word_search import contains_word  
 from mistral_api import send_post_mistral
 from obj_detect import object_detect
-from cv_live import camera_feed  # Ensure this is the correct import for your camera_feed function
+from cv_live import camera_feed 
+from dino_api import send_post_dino
 
-URL = "http://127.0.0.1:5000/v1/chat/completions"
+
+MISTRAL_SERVER_URL = "http://127.0.0.1:5000/v1/chat/completions"
+DINO_SERVER_URL = "http://127.0.0.1:8000/items/"
+IMAGE_PATH = "feed_images/capture.png"
 
 def main():
     audio_directory = "recorded_audio"
@@ -29,19 +46,20 @@ def main():
     # Pass the result queue to the transcription thread
     transcription_thread = threading.Thread(target=transcribe_audio, args=(audio_queue, stop_recording_event, model, result_queue))
     recording_thread = threading.Thread(target=record_audio, args=(audio_queue, stop_recording_event, audio_directory))
-    camera_thread = threading.Thread(target=camera_feed, args=(capture_event, 'feed_images', 'capture.png'))  # Add capture event and image info
+    camera_thread = threading.Thread(target=camera_feed, args=(capture_event, 'feed_images', 'image.png'))  # Add capture event and image info
 
+    print("Press spacebar to start recording and live cam.")
     keyboard.wait('space')  
     transcription_thread.start()
     recording_thread.start()
     camera_thread.start()
-    print("Press spacebar to start recording and live cam.")
-  
+
+    print("Recording and camera feed starting, please wait a moment before speaking...")
     keyboard.wait('space')
     capture_event.set() 
     stop_recording_event.set()
     audio_queue.put(None)
-    print("Recording and camera feed active... Press spacebar to capture image and stop.")
+    print("Recording and camera feed active... Press spacebar when finished.")
 
     # Wait for threads to finish
     recording_thread.join()
@@ -52,46 +70,41 @@ def main():
     full_transcription = result_queue.get()
     if full_transcription is None:
         print("No transcription was produced.")
-        return  # Exit if there was no transcription
+        return
 
     print("User transcribed audio:", full_transcription)    
 
-    image_path = r"feed_images/capture.png"
+    image_path = r"feed_images/image.png"
 
-    # Process the transcription
-    # if contains_word(full_transcription, "what") and contains_word(full_transcription, "where"):
-        # # print("following what and where path")
-        # # #print("[debug] following what and where path")
-
-        # what_prompt = 'With the following text, determine if the sentence is more similar to a "what" or "where" question? if the answer is "what", remove "where" and create a meaningful question.'
-
-        # # what_prompt = 'With the following text, isolate and return the "what" question:'
-
-        # what = send_post_mistral(URL, full_transcription, what_prompt)
-        # #print("[debug] what: {what}")
-        # #print(f"[info] what: {what}")
-        # prompt = "please answer the question:  "
-        # send_post_mistral(URL, what, prompt)
-
-        # where_prompt = 'With the following text, isolate and return the "where" question:'  
-        # where = send_post_mistral(URL, full_transcription, where_prompt)
-        # print(where)
-        # object_detect(image_path, where)
-
+    # full_transcription = "where is the person"
 
     if contains_word(full_transcription, "what"):
         print("following what path")
         prompt = ""
-        send_post_mistral(URL, full_transcription, prompt)
+        content, user_transcription = send_post_mistral(MISTRAL_SERVER_URL, full_transcription, prompt)
+        print("User audio input prompt:", user_transcription)
+        print("LLM response:", content)
+        
 
     elif contains_word(full_transcription, "where"):  
         print("following where path")
-        object_detect(image_path, full_transcription)    
+        boxes, accuracy, object_names, annotated_image_list,annotated_image_shape= send_post_dino(DINO_SERVER_URL, full_transcription, image_path)
+        confidence = (boxes, accuracy, object_names)    
+        print(confidence)
+
+        reconstructed_image_array = np.array(annotated_image_list, dtype=np.uint8)
+        reconstructed_image_array = reconstructed_image_array.reshape(annotated_image_shape)
+
+        data = im.fromarray(reconstructed_image_array) 
+        data.save('feed_image/image_annotated.png')         
     
-    else:
+    else:  
         print("following what path")
         prompt = ""
-        send_post_mistral(URL, full_transcription, prompt)
+        content, user_transcription = send_post_mistral(MISTRAL_SERVER_URL, full_transcription, prompt)
+        print("User audio input prompt:", user_transcription)
+        print("LLM response:", content)
+
 
 if __name__ == "__main__":
     main()
