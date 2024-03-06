@@ -11,6 +11,10 @@ from PIL import Image as im
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
+#Send post to Grounding Dino server
+#Input: Server address, Audio transcription, and file path to image
+#Output: Returns confidence, accuracy, numerical information about the bounding box, and information about the annotated image so it can be recreated
+
 def send_post_dino(api_url, prompt, image_path):
     with Image.open(image_path) as image:
         original_rgb_image = image.convert('RGB')

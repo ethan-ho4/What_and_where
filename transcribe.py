@@ -2,33 +2,35 @@ import os
 import queue
 import whisper
 
+#Concatenates to a string
+#Input: String
+#Output: String
+
 def concat_audio_transcription(current_transcription, text_to_add):
     return current_transcription + f"{text_to_add}\n"
 
-# Transcribe audio files
+
+#Asynchronously calls whisper AI python library to transcribe input audio and concatenates to a string
+#Input: Audio
+#Output: string
 def transcribe_audio(audio_queue, stop_recording_event, model, result_queue):
     full_transcription = ""
-    # Initialize a string to hold all transcriptions
 
     while not stop_recording_event.is_set() or not audio_queue.empty():
-        print("Transcription thread is polling the queue...")  # Debug print
+        print("Transcription thread is polling the queue...")
         filename = audio_queue.get()
 
-        # Check for the sentinel value to end the loop
         if filename is None:
-            # Signal that there are no more files to process
-            # Don't put None into the result_queue
             break
 
-        print(f"Attempting to transcribe file: {filename}")  # Debug print
-        if os.path.getsize(filename) > 44:  # Check if file is not just a header
+        print(f"Attempting to transcribe file: {filename}")
+        if os.path.getsize(filename) > 44:
             try:
                 print(f"Transcribing {filename}")
                 result = model.transcribe(filename)
                 transcription_text = result['text']
-                print(f"Transcription for {filename} complete.")  # Debug print
+                print(f"Transcription for {filename} complete.")
                 
-                # Append the transcription text to the full_transcription string
                 full_transcription = concat_audio_transcription(full_transcription, transcription_text)
 
             except Exception as e:
@@ -41,5 +43,4 @@ def transcribe_audio(audio_queue, stop_recording_event, model, result_queue):
 
         audio_queue.task_done()
 
-    # Once all transcriptions are done, put the full transcription into the result queue
     result_queue.put(full_transcription)

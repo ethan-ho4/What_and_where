@@ -6,10 +6,9 @@ import os
 import keyboard
 import numpy as np
 
-# Define constants
-THRESHOLD_DB = -40  # Threshold in decibels
-SILENCE_THRESHOLD = 10  # Number of consecutive silent chunks to trigger a new file
-SAMPLE_DURATION = 0.1  # Duration of each audio chunk in seconds
+THRESHOLD_DB = -40
+SILENCE_THRESHOLD = 10
+SAMPLE_DURATION = 0.1 
 FS = 44100  # Sample rate in Hz
 CHANNELS = 1  # Number of audio channels
 SILENCE_DURATION = SILENCE_THRESHOLD * SAMPLE_DURATION
@@ -22,7 +21,6 @@ def calculate_rms(audio_data):
 def amp_to_db(rms):
     return 20 * np.log10(rms)
 
-# Detect keyboard interrupt ctrl+c
 interrupt = False
 
 # Record audio chunk
@@ -82,6 +80,3 @@ def record_audio(audio_queue, stop_recording_event, audio_directory):
                 write_wave(filename, audio_data_int16, FS, CHANNELS)
                 audio_queue.put(filename)
                 print(f"Finished segment {file_number}, saved to file.")
-                # Note: We've moved file_number increment to the silence check above
-
-# ... Add any additional functionality or script initialization as needed ...

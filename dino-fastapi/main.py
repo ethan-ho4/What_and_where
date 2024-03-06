@@ -19,7 +19,10 @@ from PIL import Image as im
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
-# Define your Pydantic model for request body
+#Grounding Dino Fast API server
+#Input: Base64 string representing the image, and prompt for what to look for
+#Output: Confidence values, array and array shape to recrate the original image
+
 class Item(BaseModel):
     prompt: str
     image: str
@@ -40,11 +43,11 @@ async def annotate_image(item: Item):
 
     image_data = base64.b64decode(item.image)
     image_source = Image.open(BytesIO(image_data)).convert("RGB")
+    print(type(image_source))
 
     image = np.asarray(image_source)
     image_tensor, _ = transform(image_source, None)
 
-    # Run the prediction function
     detected_boxes, accuracy, obj_names = predict(
         model=model,
         image=image_tensor,

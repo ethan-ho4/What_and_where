@@ -2,8 +2,13 @@ import requests
 import json
 import os
 
-def send_post_mistral(api_url, transcription, prompt):
-    user_transcription = prompt + transcription
+#sends post request to Mistral API
+#Input: API address and audio transcription
+#returns audio transcription and LLM response
+
+
+
+def send_post_mistral(api_url, transcription):
         
 
     data = {
@@ -11,7 +16,7 @@ def send_post_mistral(api_url, transcription, prompt):
         "messages": [
             {
             "role": "user",
-            "content": user_transcription
+            "content":transcription
             }
         ],
         "mode": "chat",
@@ -29,4 +34,4 @@ def send_post_mistral(api_url, transcription, prompt):
     else:
         print("Error:", response.status_code, response.text)
 
-    return content, user_transcription
+    return content, transcription

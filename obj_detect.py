@@ -8,6 +8,10 @@ import base64
 import numpy as np
 import io
 
+#Detects object using Grounding Dino Locally
+#Input: Image path and what it should detect
+#Output: Annotated image and values associated with the bounding box that was annotated on the iamge as well as confidence
+
 def object_detect(image_path, search_prompt):
     CONFIG_PATH = r"groundingdino\config\GroundingDINO_SwinT_OGC.py"
     CHECK_POINT_PATH = r"weights\weights.pth"
@@ -31,8 +35,5 @@ def object_detect(image_path, search_prompt):
 
     print(detected_boxes, accuracy, obj_name)
 
-    #annotate image
     annotated_image = annotate(image_source = image_source, boxes = detected_boxes, logits = accuracy, phrases = obj_name)
-
-    #display images using supervision
     sv.plot_image(annotated_image, (16,16))

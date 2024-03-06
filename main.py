@@ -11,8 +11,8 @@ import base64
 import re
 import numpy as np
 from PIL import Image as im 
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
+# import matplotlib.pyplot as plt
+# import matplotlib.image as mpimg
 
 from io import BytesIO
 from PIL import Image
@@ -80,8 +80,7 @@ def main():
 
     if contains_word(full_transcription, "what"):
         print("following what path")
-        prompt = ""
-        content, user_transcription = send_post_mistral(MISTRAL_SERVER_URL, full_transcription, prompt)
+        content, user_transcription = send_post_mistral(MISTRAL_SERVER_URL, full_transcription)
         print("User audio input prompt:", user_transcription)
         print("LLM response:", content)
         
@@ -96,7 +95,7 @@ def main():
         reconstructed_image_array = reconstructed_image_array.reshape(annotated_image_shape)
 
         data = im.fromarray(reconstructed_image_array) 
-        data.save('feed_image/image_annotated.png')         
+        data.save('feed_images/image_annotated.png')         
     
     else:  
         print("following what path")
