@@ -17,13 +17,6 @@ import torch
 #Input: Base64 string representing the image, and prompt for what to look for
 #Output: Confidence values, array and array shape to recrate the original image
 
-<<<<<<< HEAD
-=======
-#Grounding Dino Fast API server
-#Input: Base64 string representing the image, and prompt for what to look for
-#Output: Confidence values, array and array shape to recrate the original image
-
->>>>>>> origin/main
 class Item(BaseModel):
     prompt: str
     image: str
