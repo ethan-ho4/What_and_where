@@ -5,6 +5,11 @@ import keyboard
 import whisper
 import numpy as np
 from PIL import Image as im 
+<<<<<<< HEAD
+=======
+# import matplotlib.pyplot as plt
+# import matplotlib.image as mpimg
+>>>>>>> origin/main
 
 from record import record_audio
 from transcribe import transcribe_audio
