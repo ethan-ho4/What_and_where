@@ -3,19 +3,9 @@ import queue
 import threading
 import keyboard
 import whisper
-import supervision as sv
-import cv2
-import os
-import io
-import base64
-import re
 import numpy as np
 from PIL import Image as im 
-# import matplotlib.pyplot as plt
-# import matplotlib.image as mpimg
 
-from io import BytesIO
-from PIL import Image
 from record import record_audio
 from transcribe import transcribe_audio
 from word_search import contains_word  
@@ -46,7 +36,7 @@ def main():
     # Pass the result queue to the transcription thread
     transcription_thread = threading.Thread(target=transcribe_audio, args=(audio_queue, stop_recording_event, model, result_queue))
     recording_thread = threading.Thread(target=record_audio, args=(audio_queue, stop_recording_event, audio_directory))
-    camera_thread = threading.Thread(target=camera_feed, args=(capture_event, 'feed_images', 'image.png'))  # Add capture event and image info
+    camera_thread = threading.Thread(target=camera_feed, args=(capture_event, 'feed_images', 'image.png')) 
 
     print("Press spacebar to start recording and live cam.")
     keyboard.wait('space')  
@@ -61,12 +51,10 @@ def main():
     audio_queue.put(None)
     print("Recording and camera feed active... Press spacebar when finished.")
 
-    # Wait for threads to finish
     recording_thread.join()
     transcription_thread.join()
     camera_thread.join()
 
-    # Retrieve the full transcription from the result queue after both threads have finished
     full_transcription = result_queue.get()
     if full_transcription is None:
         print("No transcription was produced.")
@@ -99,8 +87,7 @@ def main():
     
     else:  
         print("following what path")
-        prompt = ""
-        content, user_transcription = send_post_mistral(MISTRAL_SERVER_URL, full_transcription, prompt)
+        content, user_transcription = send_post_mistral(MISTRAL_SERVER_URL, full_transcription)
         print("User audio input prompt:", user_transcription)
         print("LLM response:", content)
 

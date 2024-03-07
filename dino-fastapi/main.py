@@ -2,22 +2,16 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Dict
 from io import BytesIO
-import io
-import uvicorn
 from PIL import Image
-import base64
-import numpy as np
-import groundingdino.datasets.transforms as T
-import torch
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from groundingdino.util.inference import load_model, predict, annotate
 
-import re
+import uvicorn
+import base64
 import numpy as np
-from PIL import Image as im 
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
+import groundingdino.datasets.transforms as T
+import torch
 
 #Grounding Dino Fast API server
 #Input: Base64 string representing the image, and prompt for what to look for

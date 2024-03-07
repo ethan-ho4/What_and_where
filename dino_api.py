@@ -1,15 +1,15 @@
 import requests
-import os
+# import os
 import io
-from io import BytesIO
+# from io import BytesIO
 from PIL import Image
 import base64
 
-import re
-import numpy as np
-from PIL import Image as im 
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
+# import re
+# import numpy as np
+# from PIL import Image as im 
+# import matplotlib.pyplot as plt
+# import matplotlib.image as mpimg
 
 #Send post to Grounding Dino server
 #Input: Server address, Audio transcription, and file path to image
