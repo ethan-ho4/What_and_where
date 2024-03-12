@@ -1,41 +1,21 @@
 from fastapi import FastAPI, HTTPException
-from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import Dict
 from io import BytesIO
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
+from groundingdino.util.inference import load_model, predict, annotate
 
-import argparse
+import uvicorn
 import base64
 import numpy as np
-import torch
-
-# groundingdino specific imports
-from groundingdino.util.inference import predict, annotate
-from groundingdino.models import build_model
-from groundingdino.util import box_ops
-from groundingdino.util.slconfig import SLConfig
-from groundingdino.util.utils import clean_state_dict, get_phrases_from_posmap
 import groundingdino.datasets.transforms as T
-
-# Server specific imports
-import uvicorn
-
+import torch
 
 #Grounding Dino Fast API server
 #Input: Base64 string representing the image, and prompt for what to look for
 #Output: Confidence values, array and array shape to recrate the original image
-
-def load_model(model_config_path, model_checkpoint_path, cpu_only=False):
-    args = SLConfig.fromfile(model_config_path)
-    args.device = "cuda" if not cpu_only else "cpu"
-    model = build_model(args)
-    checkpoint = torch.load(model_checkpoint_path, map_location="cpu")
-    load_res = model.load_state_dict(clean_state_dict(checkpoint["model"]), strict=False)
-    print(load_res)
-    _ = model.eval()
-    return model
 
 class Item(BaseModel):
     prompt: str
@@ -45,17 +25,10 @@ app = FastAPI()
 
 CONFIG_PATH = "groundingdino/config/GroundingDINO_SwinT_OGC.py"
 CHECK_POINT_PATH = "weights/weights.pth"
-CPU_ONLY = False
-
+model = load_model(CONFIG_PATH, CHECK_POINT_PATH)
 
 @app.post("/items/", response_model=Dict[str, object])
 async def annotate_image(item: Item):
-
-    print(f"Starting server with CPU_ONLY={CPU_ONLY}")
-
-    model = load_model(CONFIG_PATH, CHECK_POINT_PATH, cpu_only=CPU_ONLY)
-
-    # model = load_model(CONFIG_PATH, CHECK_POINT_PATH)
     transform = T.Compose([
         T.RandomResize([800], max_size=1333),
         T.ToTensor(),
@@ -98,5 +71,3 @@ async def annotate_image(item: Item):
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
-
-

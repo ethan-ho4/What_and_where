@@ -64,7 +64,7 @@ def main():
 
     image_path = r"feed_images/image.png"
 
-    # full_transcription = "where is the person"
+    full_transcription = "where is the person"
 
     if contains_word(full_transcription, "what"):
         print("following what path")
